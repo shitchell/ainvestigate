@@ -30,6 +30,74 @@ If no option is provided, you will be prompted to choose.
 EOF
 }
 
+detect_shell_rc() {
+    # Detect the user's shell and return the appropriate rc file
+    local shell_name="${SHELL##*/}"
+
+    case "${shell_name}" in
+        bash)
+            # Prefer .bashrc for interactive shells, but check if it exists
+            if [[ -f "${HOME}/.bashrc" ]]; then
+                echo "${HOME}/.bashrc"
+            elif [[ -f "${HOME}/.bash_profile" ]]; then
+                echo "${HOME}/.bash_profile"
+            else
+                echo "${HOME}/.bashrc"
+            fi
+            ;;
+        zsh)
+            echo "${HOME}/.zshrc"
+            ;;
+        fish)
+            echo "${HOME}/.config/fish/config.fish"
+            ;;
+        ksh)
+            echo "${HOME}/.kshrc"
+            ;;
+        tcsh|csh)
+            echo "${HOME}/.cshrc"
+            ;;
+        *)
+            # Fall back to .profile for POSIX shells
+            echo "${HOME}/.profile"
+            ;;
+    esac
+}
+
+check_path() {
+    # Check if install dir is in PATH and provide helpful guidance if not
+    if [[ ":${PATH}:" == *":${INSTALL_DIR}:"* ]]; then
+        return 0
+    fi
+
+    local rc_file
+    rc_file="$(detect_shell_rc)"
+    local shell_name="${SHELL##*/}"
+
+    echo
+    echo "NOTE: ${INSTALL_DIR} is not in your PATH."
+    echo
+    echo "To add it, run:"
+    echo
+
+    case "${shell_name}" in
+        fish)
+            echo "  echo 'set -gx PATH \$PATH ${INSTALL_DIR}' >> ${rc_file}"
+            ;;
+        tcsh|csh)
+            echo "  echo 'setenv PATH \$PATH:${INSTALL_DIR}' >> ${rc_file}"
+            ;;
+        *)
+            # POSIX-compatible shells (bash, zsh, ksh, sh, etc.)
+            echo "  echo 'export PATH=\"\$PATH:${INSTALL_DIR}\"' >> ${rc_file}"
+            ;;
+    esac
+
+    echo
+    echo "Then reload your shell or run:"
+    echo "  source ${rc_file}"
+}
+
 prompt_variant() {
     echo "Which variant would you like to install?"
     echo
@@ -83,12 +151,7 @@ install_variant() {
     echo "Installation complete!"
 
     # Check if install dir is in PATH
-    if [[ ":${PATH}:" != *":${INSTALL_DIR}:"* ]]; then
-        echo
-        echo "NOTE: ${INSTALL_DIR} is not in your PATH."
-        echo "Add this to your shell rc file:"
-        echo "  export PATH=\"\${PATH}:${INSTALL_DIR}\""
-    fi
+    check_path
 }
 
 main() {
