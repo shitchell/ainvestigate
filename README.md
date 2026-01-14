@@ -52,7 +52,7 @@ ainvestigate -- --dangerously-skip-permissions
 
 ## Configuration
 
-Create `~/.ainvestigate-tmux.conf` or `~/.ainvestigate-script.conf`:
+Create `~/.ainvestigate.conf`:
 
 ```bash
 # Use a different AI command
@@ -63,6 +63,8 @@ AI_CMD=("ollama" "run" "llama3")
 # Change default line count
 DEFAULT_LINES=1000
 ```
+
+The config file name is based on the script name, so if you install as `ainvestigate`, it looks for `~/.ainvestigate.conf`. You can also specify a custom config file with `--config-file <path>`.
 
 ## How It Works
 
