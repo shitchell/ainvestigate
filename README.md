@@ -4,6 +4,8 @@ AI-assisted terminal debugging. Capture your terminal output and send it to an L
 
 When something goes wrong in your terminal, just run `ainvestigate` and let AI help you figure out what happened.
 
+<img width="1920" height="980" alt="image" src="https://github.com/user-attachments/assets/17d0e49f-10f3-4014-b609-e8c109bc5d08" />
+
 ## Features
 
 - Captures recent terminal output automatically
