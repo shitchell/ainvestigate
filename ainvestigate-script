@@ -307,6 +307,7 @@ __log_dir="${AINVESTIGATE_LOG_DIR:-/tmp/ainvestigate}/${USER}"
 mkdir -p "$__log_dir" 2>/dev/null
 chmod 700 "$__log_dir" 2>/dev/null
 export __SCRIPT_SESSION_LOG="$__log_dir/$(date '+%Y%m%d_%H%M%S')_$$.log"
+touch "$__SCRIPT_SESSION_LOG" && chmod 600 "$__SCRIPT_SESSION_LOG"
 unset __log_dir
 
 exec "${BASH_SOURCE[0]}"
