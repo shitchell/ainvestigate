@@ -99,11 +99,11 @@ check_path() {
 }
 
 prompt_variant() {
-    echo "Which variant would you like to install?"
-    echo
-    echo "  1) tmux   - Uses tmux scrollback (zero overhead, tmux only)"
-    echo "  2) script - Uses script(1) logging (works anywhere)"
-    echo
+    echo "Which variant would you like to install?" >&2
+    echo >&2
+    echo "  1) tmux   - Uses tmux scrollback (zero overhead, tmux only)" >&2
+    echo "  2) script - Uses script(1) logging (works anywhere)" >&2
+    echo >&2
     read -rp "Enter choice [1/2]: " choice
     case "${choice}" in
         1|tmux)   echo "tmux" ;;
