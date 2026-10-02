@@ -62,6 +62,9 @@ AI_CMD=("gemini-cli" "chat")
 # or
 AI_CMD=("ollama" "run" "llama3")
 
+# Default startup args for the AI command (args after `--` are appended)
+AI_ARGS=("--model" "opus" "--permission-mode" "bypassPermissions")
+
 # Change default line count
 DEFAULT_LINES=1000
 ```

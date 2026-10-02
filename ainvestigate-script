@@ -21,6 +21,13 @@ declare -ri E_ALREADY_SETUP=3
 declare -a AI_CMD
 AI_CMD=("${AI_CMD[@]:-claude}")
 
+# Default arguments always passed to the AI command, before any passed on the
+# command line after `--`. Set in the config file.
+# Examples:
+#   AI_ARGS=("--model" "opus")
+#   AI_ARGS=("--permission-mode" "bypassPermissions")
+declare -a AI_ARGS=()
+
 # Default number of lines to capture from the session log
 declare -i DEFAULT_LINES=500
 
@@ -61,7 +68,8 @@ Capture Options:
     -n/--lines <count>    number of lines to capture (default: ${DEFAULT_LINES})
     -d/--dry-run          print captured output instead of sending to AI
     --config-file <file>  use the specified configuration file
-    --                    pass remaining arguments to the AI command
+    --                    pass remaining arguments to the AI command (appended
+                          after any AI_ARGS from the config file)
 
 Arguments:
     <prompt>              additional context or question to include with the
@@ -80,10 +88,11 @@ Environment:
     AINVESTIGATE_LOG_DIR  override log directory (default: /tmp/ainvestigate)
 
 Configuration:
-    Config file: ~/.ainvestigate-script.conf
+    Config file: ~/.$(basename "${0}").conf (sourced as bash)
 
     Example:
-        AI_CMD=("gemini-cli" "chat")
+        AI_CMD=("claude")
+        AI_ARGS=("--model" "opus" "--permission-mode" "bypassPermissions")
         DEFAULT_LINES=1000
 
 Examples:
@@ -107,7 +116,7 @@ EOF
 function parse-args() {
     # Parse the arguments first for a config file to load default values from
     CONFIG_FILE="${HOME}/.$(basename "${0}").conf"
-    for ((i=0; i<${#}; i++)); do
+    for ((i=1; i<=${#}; i++)); do
         case "${!i}" in
             --config-file)
                 ((i++))
@@ -124,7 +133,6 @@ function parse-args() {
     declare -g FORCE_SHELL=""
     declare -g CLEANUP_ALL=false
     declare -g USER_PROMPT=""
-    declare -ga AI_ARGS=()
 
     # Loop over the arguments
     while [[ ${#} -gt 0 ]]; do
@@ -178,7 +186,7 @@ function parse-args() {
         shift 1
     done
 
-    # Collect remaining arguments for the AI command
+    # Append remaining arguments for the AI command to any from the config file
     while [[ ${#} -gt 0 ]]; do
         AI_ARGS+=("${1}")
         shift 1
